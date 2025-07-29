@@ -221,6 +221,16 @@ body {
     max-height: 80%;
 }
 
+.imgnotfound{
+    width: 80%;
+    height: 80%;
+}
+
+.textnotfound{
+    text-align: center;
+    font-size: 30px;
+}
+
 @media screen and (max-width: 768px) {
     .container {
         justify-content: center !important;
@@ -229,6 +239,10 @@ body {
     .card    {
         margin-right: 10px;
         width: 95vw;
+    }
+
+    .textnotfound{
+        font-size: 22px;
     }
 }
 

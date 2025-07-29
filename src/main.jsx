@@ -8,6 +8,7 @@ import './css/style.css';
 import './css/progressbar.css';
 
 // ทั้งหมด
+import AuthGuard from './page/component/authguard';
 import Index from './page/index';
 import Menu from './page/menu';
 import Home from './page/home';
@@ -15,18 +16,22 @@ import Crew from './page/crew';
 import Evaluates from './page/evaluates';
 import Evaluatelist from './page/evaluatelist';
 import Result from './page/result';
+import Notfound from './notfound';
 
 const Main = () => {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path='/' element={<Index />}></Route>
-                <Route path='/home' element={<Home />}></Route>
-                <Route path='/menu' element={<Menu />}></Route>
-                <Route path='/crew' element={<Crew />}></Route>
-                <Route path='/evaluates' element={<Evaluates />}></Route>
-                <Route path='/evaluatelist' element={<Evaluatelist />}></Route>
-                <Route path='/result' element={<Result />}></Route>
+                <Route element={<AuthGuard />}>
+                    <Route path='/' element={<Index />}></Route>
+                    <Route path='/home' element={<Home />}></Route>
+                    <Route path='/menu' element={<Menu />}></Route>
+                    <Route path='/crew' element={<Crew />}></Route>
+                    <Route path='/evaluates' element={<Evaluates />}></Route>
+                    <Route path='/evaluatelist' element={<Evaluatelist />}></Route>
+                    <Route path='/result' element={<Result />}></Route>
+                </Route>
+                <Route path='*' element={<Notfound />}></Route>
             </Routes>
         </BrowserRouter>
     )

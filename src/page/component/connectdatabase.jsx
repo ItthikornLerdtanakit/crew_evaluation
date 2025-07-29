@@ -22,7 +22,7 @@ export const login = async (nokid, password) => {
 
 // ออกจากระบบและเคลียร์ session ทุกอย่าง
 export const logout = async () => {
-    localStorage.removeItem(import.meta.env.VITE_TOKEN);
+    localStorage.removeItem('tokens');
     window.location.href = '/';
 }
 
