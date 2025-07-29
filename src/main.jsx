@@ -7,7 +7,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import './css/style.css';
 import './css/progressbar.css';
 
-// ทั้งหมด
+// ทั้งหมด1234
 import Index from './page/index';
 import Menu from './page/menu';
 import Home from './page/home';
