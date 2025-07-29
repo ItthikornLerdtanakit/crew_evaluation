@@ -1,0 +1,25 @@
+# Disable MultiViews to prevent Apache from attempting to match similar file names
+Options -MultiViews
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# CORS settings
+<IfModule mod_headers.c>
+    # Allow cross-origin requests from https://itthikorn-yanachot.online
+    Header set Access-Control-Allow-Origin "https://itthikorn-yanachot.online"
+    
+    # Methods allowed in CORS requests
+    Header set Access-Control-Allow-Methods "GET,POST,OPTIONS,DELETE,PUT"
+
+    # Allowed headers
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+    
+    # If you need to allow credentials like cookies
+    Header set Access-Control-Allow-Credentials true
+</IfModule>
+
+# Rewrite rule to route all requests to index.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]
