@@ -201,7 +201,7 @@ const Evaluates = () => {
         // ส่งข้อมูล
         const result = await save_evaluation(Employee.id, decoded.crew_id, SelectedPartID, results, allCheckStates, parseFloat((getTotalScore() / getTotalGroups()).toFixed(1)));
         if (result === 'success') {
-            alertsuccessredirect('Evaluation saved successfully.', '/crew');
+            alertsuccessredirect('Evaluation saved successfully.');
         } else {
             alertsmall('error', 'Please contact the system administrator.');
         }

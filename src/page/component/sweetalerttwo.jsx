@@ -41,7 +41,7 @@ export const alertquestion = async (text) => {
 }
 
 // แจ้งเตือนสำเร็จ พร้อม Redireact
-export const alertsuccessredirect = (text, link) => {
+export const alertsuccessredirect = (text) => {
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
           confirmButton: 'btn btn-success m-2'
@@ -53,12 +53,12 @@ export const alertsuccessredirect = (text, link) => {
         text: text,
         icon: 'success',
         confirmButtonText: 'OK'
-    }).then((result) => handleRedirect(result, link));
+    }).then((result) => handleRedirect(result));
 }
 
-const handleRedirect = (result, link) => {
+const handleRedirect = (result) => {
     if (result.isConfirmed) {
-        window.location.href = link;
+        window.history.back();
     }
 };
 
