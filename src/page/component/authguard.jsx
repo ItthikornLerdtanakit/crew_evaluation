@@ -4,7 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 
 // กติกาสิทธิ์ของแต่ละ level (แก้ได้ที่นี่)
 const ACCESS = {
-    level_1: { allowed: ['/home', '/result'],                     default: '/home' },
+    level_1: { allowed: ['/home', '/result'], default: '/home' },
     level_2: { allowed: ['/menu', '/home', '/crew', '/evaluates', '/result'], default: '/menu' },
     level_3: { allowed: ['/menu', '/home', '/crew', '/evaluates', '/result'], default: '/menu' },
     level_4: { allowed: ['/crew', '/evaluatelist', '/result'],    default: '/crew' },

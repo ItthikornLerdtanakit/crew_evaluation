@@ -45,15 +45,24 @@ const Evaluates = () => {
     const [Eval, setEval] = useState('');
     const get_database = async () => {
         const result_part = await get_part();
-        setSelectedPartID(result_part[0].part_id)
-        setSelectedPart(result_part[0].part_name);
-        const options = result_part.map(part => ({
+        const results = await get_evaluation();
+        let partfilter, evlfilter;
+        if (location.state.crew_level === 'level_1') {
+            partfilter = await result_part.filter(item => item.part_no !== 'part4');
+            evlfilter = await results.filter(item => item.part_id !== 4);
+        } else {
+            partfilter = result_part;
+            evlfilter = results;
+        }
+        setSelectedPartID(partfilter[0].part_id);
+        setSelectedPart(partfilter[0].part_name);
+        const options = partfilter.map(part => ({
             value: part.part_id,
-            label: part.part_name
+            label: part.part_name,
+            partno: part.part_no.replace(/([a-zA-Z]+)(\d+)/, '$1 $2').replace(/^./, c => c.toUpperCase())
         }));
         setPart(options);
-        const results = await get_evaluation();
-        setEval(results);
+        setEval(evlfilter);
     }
 
     // ทุกครั้งที่กด
@@ -229,19 +238,12 @@ const Evaluates = () => {
                     <Row className='midpoint'>
                         <Col md={7}>
                             <p style={{textAlign: 'center'}}>Crew Evaluation Progress Bar</p>
-                            <ul id='progressbar' className='text-center'>
-                                <li data-step={1} className={`step0 ${SelectedPartID >= 1 ? 'active' : ''} ${SelectedPartID > 1 ? 'success' : ''}`}>
-                                    <span className='step-label'>Part 1</span>
-                                </li>
-                                <li data-step={2} className={`step0 ${SelectedPartID >= 2 ? 'active' : ''} ${SelectedPartID > 2 ? 'success' : ''}`}>
-                                    <span className='step-label'>Part 2</span>
-                                </li>
-                                <li data-step={3} className={`step0 ${SelectedPartID >= 3 ? 'active' : ''} ${SelectedPartID > 3 ? 'success' : ''}`}>
-                                    <span className='step-label'>Part 3</span>
-                                </li>
-                                <li data-step={4} className={`step0 ${SelectedPartID >= 4 ? 'active' : ''} ${SelectedPartID > 4 ? 'success' : ''}`}>
-                                    <span className='step-label'>Part 4</span>
-                                </li>
+                            <ul id='progressbar' className='text-center midpoint'>
+                                {Part && Part.map(data => (
+                                    <li key={data.value} data-step={data.value} className={`step0 ${SelectedPartID >= data.value ? 'active' : ''} ${SelectedPartID > data.value ? 'success' : ''}`}>
+                                        <span className='step-label'>{data.partno}</span>
+                                    </li>
+                                ))}
                             </ul>
                         </Col>
                         <Col md={7}>

@@ -109,7 +109,7 @@ const Index = () => {
                         <b style={{fontSize: '30px'}}>Login</b>
                     </Col>
                     <Col md={12} className='midpoint'>
-                        <p>Crew Assessment Website</p>
+                        <p>Crew Evaluation Website</p>
                     </Col>
                     <Col md={12} className='midpoint mt-3'>
                         <Form style={{width: '100%'}} onSubmit={(e) => e.preventDefault()}>

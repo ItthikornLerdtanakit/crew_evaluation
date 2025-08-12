@@ -47,74 +47,74 @@ const Home = () => {
 
     return (
         <Container fluid>
-        {decoded.crew_level === 'level_2' || decoded.crew_level === 'level_3' ? (
-            <Navbarback />
-        ) : (
-            <Navbarlogout />
-        )}
-        <Row style={{flex: 1}}>
-            <Col md={12}>
-                <Row className='titles mt-4'>
-                    <p>Crew Evaluation</p>
-                </Row>
-                <Row className='midpoint cardtext'>
-                    <div className='card'>
-                        <Row>
-                            <Col className='col-5'>
-                                <p className='headertext mb-2'>NOKID:</p>
-                                <p className='headertext mb-2'>Position:</p>
-                                <p className='headertext mb-2'>Round:</p>
-                            </Col>
-                            <Col className='col-7'>
-                                <p className='mb-2'>{decoded.crew_code}</p>
-                                <p className='mb-2'>{decoded.crew_nameen}</p>
-                                <p>{'2/2025'}</p>
-                            </Col>
-                        </Row>
-                    </div>
-                </Row>
-                {Round && Round.length > 0 ? Round.map((round) => (
-                    <div key={round}>
-                        <Row>
-                            <Col md={12} className='title_round mt-2'>
-                                <p>Evaluation Round - {round}</p>
-                            </Col>
-                        </Row>
-                        <Row className='mt-2 cardtext'>
-                            {Evaluation && Evaluation.filter(item => item.round === round).map(data => (
-                                <div key={data.evaluation_id} className='card'>
-                                    <Row>
-                                        <Col className='col-5'>
-                                            <p className='headertext mb-2'>Leader Name:</p>
-                                            <p className='headertext mb-2'>Date Evaluation:</p>
-                                            <p className='headertext mb-2'>Score:</p>
-                                        </Col>
-                                        <Col className='col-7'>
-                                            <p className='mb-2'>{data.crew_nameen}</p>
-                                            <p className='mb-2'>{data.evaluation_created_at}</p>
-                                            <p className='mb-2'>{data.evaluation_totalscore} / 5.0</p>
-                                        </Col>
-                                        <Col className='col-12' style={{display: 'flex', justifyContent: 'flex-end'}}>
-                                            <button className='textlink' onClick={() => navigate('/result', { state: data })}>
-                                                Assessment details {'>>'}
-                                            </button>
-                                        </Col>
-                                    </Row>
-                                </div>
-                            ))}
-                        </Row>
-                    </div>
-                )) : (
-                    <Row>
-                        <Col md={12} className='midpoint'>
-                            <p className='mt-4' style={{fontSize: '18px', color: 'gray'}}>No evaluation results available.</p>
-                        </Col>
+            {decoded.crew_level === 'level_2' || decoded.crew_level === 'level_3' ? (
+                <Navbarback />
+            ) : (
+                <Navbarlogout />
+            )}
+            <Row style={{flex: 1}}>
+                <Col md={12}>
+                    <Row className='titles mt-4'>
+                        <p>Crew Evaluation</p>
                     </Row>
-                )}
-            </Col>
-        </Row>
-        <Footer />
-    </Container>
+                    <Row className='midpoint cardtext'>
+                        <div className='card'>
+                            <Row>
+                                <Col className='col-5'>
+                                    <p className='headertext mb-2'>NOKID:</p>
+                                    <p className='headertext mb-2'>Position:</p>
+                                    <p className='headertext mb-2'>Round:</p>
+                                </Col>
+                                <Col className='col-7'>
+                                    <p className='mb-2'>{decoded.crew_code}</p>
+                                    <p className='mb-2'>{decoded.crew_nameen}</p>
+                                    <p>{'2/2025'}</p>
+                                </Col>
+                            </Row>
+                        </div>
+                    </Row>
+                    {Round && Round.length > 0 ? Round.map((round) => (
+                        <div key={round}>
+                            <Row>
+                                <Col md={12} className='title_round mt-2'>
+                                    <p>Evaluation Round - {round}</p>
+                                </Col>
+                            </Row>
+                            <Row className='mt-2 cardtext'>
+                                {Evaluation && Evaluation.filter(item => item.round === round).map(data => (
+                                    <div key={data.evaluation_id} className='card'>
+                                        <Row>
+                                            <Col className='col-5'>
+                                                <p className='headertext mb-2'>Leader Name:</p>
+                                                <p className='headertext mb-2'>Date Evaluation:</p>
+                                                <p className='headertext mb-2'>Score:</p>
+                                            </Col>
+                                            <Col className='col-7'>
+                                                <p className='mb-2'>{data.crew_nameen}</p>
+                                                <p className='mb-2'>{data.evaluation_created_at}</p>
+                                                <p className='mb-2'>{data.evaluation_totalscore} / 5.0</p>
+                                            </Col>
+                                            <Col className='col-12' style={{display: 'flex', justifyContent: 'flex-end'}}>
+                                                <button className='textlink' onClick={() => navigate('/result', { state: data })}>
+                                                    Evaluation details {'>>'}
+                                                </button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                ))}
+                            </Row>
+                        </div>
+                    )) : (
+                        <Row>
+                            <Col md={12} className='midpoint'>
+                                <p className='mt-4' style={{fontSize: '18px', color: 'gray'}}>No evaluation results available.</p>
+                            </Col>
+                        </Row>
+                    )}
+                </Col>
+            </Row>
+            <Footer />
+        </Container>
 
     )
 }

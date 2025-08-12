@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const ipaddress = 'https://crewnokairbackend.maxitthikorn.online';
+// const ipaddress = 'https://crewnokairbackend.maxitthikorn.online';
+const ipaddress = 'http://localhost:3001';
 
 // เข้าสู่ระบบสำหรับการประเมิน (ส่งไปหาระบบหลังบ้าน)
 export const login = async (nokid, password) => {
     try {
-        const response = await axios.post(ipaddress + '/api/login', { nokid, password });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_LOGIN, { nokid, password });
         if (response.data.auth === false) {
             return response.data;
         } else {
@@ -29,7 +30,7 @@ export const logout = async () => {
 // ดึงข้อมูลชื่อ Part
 export const get_part = async () => {
     try {
-        const response = await axios.get(ipaddress + '/api/part');
+        const response = await axios.get(ipaddress + import.meta.env.VITE_PART);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -39,7 +40,7 @@ export const get_part = async () => {
 // ดึงข้อมูลคำถามการประเมิน
 export const get_evaluation = async () => {
     try {
-        const response = await axios.get(ipaddress + '/api/eval_question');
+        const response = await axios.get(ipaddress + import.meta.env.VITE_EVAL_QUESTION);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -49,7 +50,7 @@ export const get_evaluation = async () => {
 // ดึงข้อมูลผู้ประเมิน
 export const get_evaluator = async (level, supervisor) => {
     try {
-        const response = await axios.post(ipaddress + '/api/evaluator', { level, supervisor });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_EVALUATOR, { level, supervisor });
         return response.data;
     } catch (error) {
         console.error(error);
@@ -59,7 +60,7 @@ export const get_evaluator = async (level, supervisor) => {
 // ดึงข้อมูลผู้ประเมินรายคน
 export const get_evaluator_person = async (crewid) => {
     try {
-        const response = await axios.post(ipaddress + '/api/evaluator_person', { crewid });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_EVALUATOR_PERSON, { crewid });
         return response.data;
     } catch (error) {
         console.error(error);
@@ -69,7 +70,7 @@ export const get_evaluator_person = async (crewid) => {
 // บันทึกข้อมูลการประเมิน
 export const save_evaluation = async (employee, supervisor, part, evaluation_group, evaluation_item, total) => {
     try {
-        const response = await axios.post(ipaddress + '/api/save_evaluation', { employee, supervisor, part, evaluation_group, evaluation_item, total });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_SAVE_EVALUATION, { employee, supervisor, part, evaluation_group, evaluation_item, total });
         return response.data;
     } catch (error) {
         console.error(error);
@@ -79,7 +80,7 @@ export const save_evaluation = async (employee, supervisor, part, evaluation_gro
 // ดึงข้อมูบผลการประเมินของลูกเรือ
 export const get_result_evaluation = async (id) => {
     try {
-        const response = await axios.post(ipaddress + '/api/result_evaluation', { id });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_RESULT_EVALUATION, { id });
         return response.data;
     } catch (error) {
         console.error(error);
@@ -89,7 +90,7 @@ export const get_result_evaluation = async (id) => {
 // ดึงข้อมูบผลการประเมินของลูกเรือสำหรับหัวข้อใหญ่
 export const get_result_evaluation_group = async (id) => {
     try {
-        const response = await axios.post(ipaddress + '/api/result_evaluation_group', { id });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_RESULT_EVALUATION_GROUP, { id });
         return response.data;
     } catch (error) {
         console.error(error);
@@ -99,7 +100,7 @@ export const get_result_evaluation_group = async (id) => {
 // ดึงข้อมูบผลการประเมินของลูกเรือสำหรับหัวข้อย่อย
 export const get_result_evaluation_item = async (id) => {
     try {
-        const response = await axios.post(ipaddress + '/api/result_evaluation_item', { id });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_RESULT_EVALUATION_ITEM, { id });
         return response.data;
     } catch (error) {
         console.error(error);

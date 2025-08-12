@@ -45,7 +45,13 @@ const Result = () => {
         const result_part = await get_part();
         setSelectedPartID(result_part[0].part_id)
         setSelectedPart(result_part[0].part_name);
-        const options = result_part.map(part => ({
+        let partfilter;
+        if (location.state.crew_level === 'level_1') {
+            partfilter = await result_part.filter(item => item.part_no !== 'part4');
+        } else {
+            partfilter = result_part;
+        }
+        const options = partfilter.map(part => ({
             value: part.part_id,
             label: part.part_name
         }));
