@@ -25,6 +25,7 @@ const Evaluatelist = () => {
         if (!location.state) {
             return navigate(-1);
         }
+        console.log(location.state);
         get_database();
     }, []);
 
@@ -37,7 +38,15 @@ const Evaluatelist = () => {
     }
 
     const redirect = (data) => {
-        navigate('/result', { state: data });
+        let data_crew = location.state;
+        delete data_crew.evaluation_totalscore;
+        // เพิ่ม key ใหม่
+        data_crew = {
+            ...data_crew,
+            evaluator_name: data.crew_nameen,
+            evaluation_totalscore: data.evaluation_totalscore // ใส่ใหม่แทนของเก่า
+        };
+        navigate('/result', { state: data_crew });
     }
 
     return (

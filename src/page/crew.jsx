@@ -41,7 +41,13 @@ const Crew = () => {
         if (decoded.crew_level === 'level_4') {
             navigate('/evaluatelist', { state: data });
         } else if (data.status) {
-            navigate('/result', { state: data });
+            let data_crew = data;
+            // เพิ่ม key ใหม่
+            data_crew = {
+                ...data_crew,
+                evaluator_name: decoded.crew_nameen
+            };
+            navigate('/result', { state: data_crew });
         } else {
             navigate('/evaluates', { state: data });
         }

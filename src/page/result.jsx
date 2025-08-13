@@ -29,7 +29,7 @@ const Result = () => {
         if (!location.state) {
             return navigate(-1);
         }
-        setEmployee({ nokid: 1, name: location.state.crew_nameen, date: location.state.evaluation_created_at, score: location.state.evaluation_totalscore, position: location.state.crew_position, eval_id: location.state.evaluation_id });
+        setEmployee(location.state);
         get_database(location.state.evaluation_id);
     }, []);
 
@@ -98,12 +98,14 @@ const Result = () => {
                                     <p className='headertext mb-2'>Date Evaluation:</p>
                                     <p className='headertext mb-2'>Score:</p>
                                     <p className='headertext mb-2'>Position:</p>
+                                    <p className='headertext mb-2'>Evaluator Name:</p>
                                 </Col>
                                 <Col className='col-7'>
-                                    <p className='mb-2'>{Employee.name}</p>
-                                    <p className='mb-2'>{Employee.date}</p>
-                                    <p className='mb-2'>{Employee.score} / 5.0</p>
-                                    <p className='mb-2'>{Employee.position}</p>
+                                    <p className='mb-2'>{Employee.crew_nameen}</p>
+                                    <p className='mb-2'>{Employee.evaluation_created_at}</p>
+                                    <p className='mb-2'>{Employee.evaluation_totalscore} / 5.0</p>
+                                    <p className='mb-2'>{Employee.crew_position}</p>
+                                    <p className='mb-2'>{Employee.evaluator_name}</p>
                                 </Col>
                             </Row>
                         </div>
