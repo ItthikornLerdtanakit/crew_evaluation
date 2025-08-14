@@ -25,7 +25,6 @@ const Evaluatelist = () => {
         if (!location.state) {
             return navigate(-1);
         }
-        console.log(location.state);
         get_database();
     }, []);
 
@@ -85,6 +84,43 @@ const Evaluatelist = () => {
                         </Table>
                     </Col>
                 </Row>
+                {Employee && Employee.length > 1 ? (
+                    <>
+                        <Row className='mt-5' style={{textAlign: 'center'}}>
+                            <h3>Comparison of Scores Table</h3>
+                        </Row>
+                        <Row className='midpoint'>
+                            <Col md={7}>
+                                <Table className='tables'>
+                                    <thead className='theadtext'>
+                                        <tr>
+                                            <th style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>Name</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 1: SAFETY COMPLIANCE</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 2: SERVICE DELIVERY</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 3: PROFESSIONAL CREW</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 4: LEADERSHIP SKILLS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className='tbodytext'>
+                                        {Employee && Employee.length > 0 ? Employee.map(data => (
+                                            <tr key={data.crew_id}>
+                                                <td style={{verticalAlign: 'middle'}}>{data.crew_nameen}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part1}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part2}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part3}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part4 || '-'}</td>
+                                            </tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan={5} style={{fontSize: '16px', fontWeight: 600, textAlign: 'center'}}>No evaluator list available.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+                    </>
+                ) : null}
             </Col>
         </Row>
         <Footer />

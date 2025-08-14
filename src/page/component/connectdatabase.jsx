@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
-const ipaddress = 'https://crewnokairbackend.maxitthikorn.online';
+// const ipaddress = 'https://crewnokairbackend.maxitthikorn.online';
+const ipaddress = 'http://192.168.2.33:3001';
 
 // เข้าสู่ระบบสำหรับการประเมิน (ส่งไปหาระบบหลังบ้าน)
 export const login = async (nokid, password) => {

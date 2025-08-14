@@ -221,12 +221,12 @@ body {
     max-height: 80%;
 }
 
-.imgnotfound{
+.imgnotfound {
     width: 80%;
     height: 80%;
 }
 
-.textnotfound{
+.textnotfound {
     text-align: center;
     font-size: 30px;
 }
@@ -244,6 +244,13 @@ body {
     .textnotfound{
         font-size: 22px;
     }
+
+    th.coms {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+        white-space: nowrap;
+        font-size: 0.8rem;
+      }
 }
 
 @media screen and (max-width: 400px) {
