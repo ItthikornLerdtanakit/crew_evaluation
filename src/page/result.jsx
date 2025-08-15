@@ -7,7 +7,6 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
 
 import { BsCheckLg } from 'react-icons/bs';
 
@@ -16,7 +15,6 @@ import { customStylesPart } from '../css/styles';
 import Navbars from './component/navbar/navbarback';
 import Footer from './component/footer';
 import { get_part, get_evaluation, get_result_evaluation_group, get_result_evaluation_item } from './component/connectdatabase';
-import Modalviewcomment from './component/modal/modalviewcomment';
 
 const Result = () => {
     const location = useLocation();
@@ -76,17 +74,6 @@ const Result = () => {
         setSelectedPartID(selectedOption.value);
         setSelectedPart(selectedOption.label); // เก็บข้อมูลของตัวเลือกที่เลือก
     };
-
-    // Modal and comment functionality
-    const [showModal, setShowModal] = useState(false);
-    const [selectedGroup, setSelectedGroup] = useState(null);
-    const [commentText, setCommentText] = useState('');
-    const CommentEval = (group, comment) => {
-        setSelectedGroup(group);
-        setCommentText(comment);
-        setShowModal(true);
-    };
-    const handleCloseModal = () => setShowModal(false);
   
     return (
         <Container fluid id='footer'>
@@ -192,7 +179,6 @@ const Result = () => {
 
                 </Col>
             </Row>
-            <Modalviewcomment showModal={showModal} handleCloseModal={handleCloseModal} selectedGroup={selectedGroup} commentText={commentText} disableds={false} />
             <Footer />
         </Container>
     )
