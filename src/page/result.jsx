@@ -24,6 +24,7 @@ const Result = () => {
 
     // โหลดข้อมูลเมื่อเริ่มต้น
     const [Employee, setEmployee] = useState({});
+    const [Comment, setComment] = useState('-');
     useEffect(() => {
         document.title = 'Crew Evaluation Result';
         if (!location.state) {
@@ -58,6 +59,11 @@ const Result = () => {
         setPart(options);
         const results = await get_evaluation();
         setEval(results);
+        const result_comment = results.filter(item => item.evaluation_question_section === 'one').reduce((acc, data) => {
+            acc[data.evaluation_question_group] = data.evaluation_question_id;
+            return acc;
+        }, {});
+        setComment(result_comment);
         const result_eval_group = await get_result_evaluation_group(eval_id);
         setEvalGroupResult(result_eval_group);
         const result_eval_item = await get_result_evaluation_item(eval_id);
@@ -122,22 +128,20 @@ const Result = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {Eval && Eval.filter(data => data.part_id === SelectedPartID).map((data, index) => {
+                                    {Eval && Eval.filter(data => data.part_id === SelectedPartID).map((data, index, arr) => {
+                                        const isLastInGroup = index === arr.length - 1 || arr[index + 1].evaluation_question_group !== data.evaluation_question_group;
                                         if (data.evaluation_question_section === 'one') {
                                             // ข้อความตัวหน้า: รวม cell 1,2 เป็นข้อความ, cell 3 = select+ปุ่ม
                                             return (
                                                 <tr key={data.evaluation_question_id}>
-                                                    <td colSpan={2} style={{fontWeight: 700, fontSize: 16, whiteSpace: EvalGroupResult && EvalGroupResult[data.evaluation_question_id].comment !== '-' ? 'normal' : 'nowrap', maxWidth: '40vw'}}>
+                                                    <td colSpan={2} style={{fontWeight: 700, fontSize: 16, backgroundColor: '#dcdcdc', whiteSpace: EvalGroupResult && EvalGroupResult[data.evaluation_question_id].comment !== '-' ? 'normal' : 'nowrap', maxWidth: '40vw'}}>
                                                         {data.evaluation_question_text}
                                                     </td>
-                                                    <td className='columnthrees'>
+                                                    <td className='columnthrees' style={{backgroundColor: '#dcdcdc'}}>
                                                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
                                                             <span style={{fontSize: '14px'}}>
                                                                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
                                                                     <span style={{fontWeight: '700'}}>Score: {EvalGroupResult ? (EvalGroupResult[data.evaluation_question_id].weight * EvalGroupResult[data.evaluation_question_id].score).toFixed(1) : '0.0'}</span>
-                                                                    {EvalGroupResult && EvalGroupResult[data.evaluation_question_id].comment !== '-' ? (
-                                                                        <Button variant='warning' size='sm' style={{ marginLeft: '5px', fontWeight: 600, borderRadius: '12px', minWidth: '70px', fontSize: '12px' }} onClick={() => CommentEval(data.evaluation_question_group, EvalGroupResult[data.evaluation_question_id].comment)}>Comment</Button>
-                                                                    ): null}
                                                                 </div>
                                                             </span>
                                                         </div>
@@ -147,24 +151,31 @@ const Result = () => {
                                         } else {
                                             // รายการย่อย: cell 1 = checkbox/ว่าง, cell 2+3 รวมกัน = ข้อความ
                                             return (
-                                                <tr key={index + 1}>
-                                                    <td style={{textAlign: 'center', verticalAlign: 'middle', width: 40}}>
-                                                        {data.evaluation_question_section === 'two' && EvalGroupItem && EvalGroupItem[data.evaluation_question_id]?.check ? <BsCheckLg /> : null}
-                                                    </td>
-                                                    <td colSpan={2} style={{fontSize: 14, fontWeight: 400}}>
-                                                        {data.evaluation_question_section === 'three' ? (
-                                                            <span className='dot'>•</span>
-                                                        ) : null}
-                                                        {data.evaluation_question_text}
-                                                    </td>
-                                                </tr>
+                                                <>
+                                                    <tr key={index + 1}>
+                                                        <td style={{textAlign: 'center', verticalAlign: 'middle', width: 40}}>
+                                                            {data.evaluation_question_section === 'two' && EvalGroupItem && EvalGroupItem[data.evaluation_question_id]?.check ? <BsCheckLg /> : null}
+                                                        </td>
+                                                        <td colSpan={2} style={{fontSize: 14, fontWeight: 400}}>
+                                                            {data.evaluation_question_section === 'three' ? (
+                                                                <span className='dot'>•</span>
+                                                            ) : null}
+                                                            {data.evaluation_question_text}
+                                                        </td>
+                                                    </tr>
+                                                    {isLastInGroup && (
+                                                        <tr>
+                                                            <td colSpan={3} style={{height: '100px', fontWeight: 700, fontSize: 14, fontStyle: 'italic'}}>Comment : {Comment && EvalGroupResult ? EvalGroupResult[Comment[data.evaluation_question_group]].comment : '-'}</td>
+                                                        </tr>
+                                                    )}
+                                                </>
                                             );
                                         }
                                     })}
                                     {Eval && Eval.filter(data => data.part_id === SelectedPartID).length > 0 ? (
                                         <tr>
                                             <td colSpan={3} style={{textAlign: 'right', fontWeight: 700}}>
-                                                <span>Total : {Employee.score}</span>
+                                                <span>Total : {Employee.evaluation_totalscore.toFixed(1)}</span>
                                             </td>
                                         </tr>
                                     ) : (

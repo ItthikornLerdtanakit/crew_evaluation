@@ -95,10 +95,10 @@ const Evaluatelist = () => {
                                     <thead className='theadtext'>
                                         <tr>
                                             <th style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>Name</th>
-                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 1: SAFETY COMPLIANCE</th>
-                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 2: SERVICE DELIVERY</th>
-                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 3: PROFESSIONAL CREW</th>
-                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'center'}}>PART 4: LEADERSHIP SKILLS</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 1: SAFETY COMPLIANCE</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 2: SERVICE DELIVERY</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 3: PROFESSIONAL CREW</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 4: LEADERSHIP SKILLS</th>
                                         </tr>
                                     </thead>
                                     <tbody className='tbodytext'>
