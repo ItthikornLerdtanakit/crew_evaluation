@@ -68,9 +68,9 @@ export const get_evaluator_person = async (crewid) => {
 }
 
 // บันทึกข้อมูลการประเมิน
-export const save_evaluation = async (employee, supervisor, part, evaluation_group, evaluation_item, total) => {
+export const save_evaluation = async (employee, supervisor, evaluation_group, evaluation_item, total, status) => {
     try {
-        const response = await axios.post(ipaddress + import.meta.env.VITE_SAVE_EVALUATION, { employee, supervisor, part, evaluation_group, evaluation_item, total });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_SAVE_EVALUATION, { employee, supervisor, evaluation_group, evaluation_item, total, status });
         return response.data;
     } catch (error) {
         console.error(error);

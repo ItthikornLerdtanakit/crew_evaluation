@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 
 // นำเข้ามาจาก Bootstrap
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import { customStylesPart } from '../css/styles';
 import Navbarback from './component/navbar/navbarback';
 import Navbarlogout from './component/navbar/navbarlogout';
 import Footer from './component/footer';
@@ -45,6 +47,8 @@ const Home = () => {
         return (month >= 1 && month <= 6) ? `1/${year}` : `2/${year}`;
     }
 
+    const Options_UserType = [{ value: 1, label: 1 }, { value: 2, label: 2 }, { value: 3, label: 3 }, { value: 4, label: 4 }, { value: 5, label: 5 }];
+
     return (
         <Container fluid>
             {decoded.crew_level === 'level_2' || decoded.crew_level === 'level_3' ? (
@@ -72,6 +76,11 @@ const Home = () => {
                                 </Col>
                             </Row>
                         </div>
+                    </Row>
+                    <Row>
+                        <Col md={12}>
+                            <Select options={Options_UserType} styles={customStylesPart} isSearchable={false} placeholder='Select Your Parts' />
+                        </Col>
                     </Row>
                     {Round && Round.length > 0 ? Round.map((round) => (
                         <div key={round}>

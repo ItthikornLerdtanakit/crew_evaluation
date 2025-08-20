@@ -99,16 +99,18 @@ const Evaluatelist = () => {
                                             <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 2: SERVICE DELIVERY</th>
                                             <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 3: PROFESSIONAL CREW</th>
                                             <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>PART 4: LEADERSHIP SKILLS</th>
+                                            <th className='coms' style={{verticalAlign: 'middle', whiteSpace: 'normal', wordWrap: 'break-word', maxWidth: '120px', textAlign: 'left'}}>Total Score</th>
                                         </tr>
                                     </thead>
                                     <tbody className='tbodytext'>
                                         {Employee && Employee.length > 0 ? Employee.map(data => (
                                             <tr key={data.crew_id}>
                                                 <td style={{verticalAlign: 'middle'}}>{data.crew_nameen}</td>
-                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part1}</td>
-                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part2}</td>
-                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part3}</td>
-                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part4 || '-'}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part1.toFixed(1)}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part2.toFixed(1)}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part3.toFixed(1)}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.part4 ? data.part4.toFixed(1) : '-'}</td>
+                                                <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.evaluation_totalscore.toFixed(1)}</td>
                                             </tr>
                                         )) : (
                                             <tr>

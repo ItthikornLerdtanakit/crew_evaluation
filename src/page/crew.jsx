@@ -17,7 +17,6 @@ import { get_evaluator } from './component/connectdatabase';
 
 // การนำเข้าและประกาศ Object ให้กับรูป Icon สำหรับ React
 import { GoChevronRight } from 'react-icons/go';
-import { BsCheckLg } from 'react-icons/bs';
 
 const Crew = () => {
     const navigate = useNavigate();
@@ -88,7 +87,7 @@ const Crew = () => {
                                 <tr>
                                     <th style={{verticalAlign: 'middle'}}>NokID</th>
                                     <th style={{verticalAlign: 'middle'}}>Name</th>
-                                    <th style={{verticalAlign: 'middle'}}>Evaluator</th>
+                                    <th style={{verticalAlign: 'middle'}}>Result</th>
                                     <th style={{width: '40px'}}></th>
                                 </tr>
                             </thead>
@@ -99,7 +98,7 @@ const Crew = () => {
                                         <td style={{verticalAlign: 'middle'}}>{data.crew_nameen}</td>
                                         <td style={{textAlign: 'center', verticalAlign: 'middle'}}>
                                             {data.status > 0 ? (
-                                                <span className='checkicon'><BsCheckLg /></span>
+                                                <span className='checkicon' style={{color: data.evaluation_status === 'Pass' ? 'green' : 'red'}}>{data.evaluation_status}</span>
                                             ) : null}
                                         </td>
                                         <td style={{fontSize: '20px', verticalAlign: 'middle', padding: 0}}><GoChevronRight /></td>

@@ -11,11 +11,10 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 
 import { customStylesRating } from '../css/styles';
-
 import Navbars from './component/navbar/navbarback';
 import Footer from './component/footer';
 import { get_part, get_evaluation, save_evaluation } from './component/connectdatabase';
-import { loading, alertquestion, alertsmall, alertsuccessredirect } from './component/sweetalerttwo';
+import { loading, alertquestion, alertwarning, alertsmall, alertsuccessredirect } from './component/sweetalerttwo';
 import Modalcomment from './component/modal/modalcomment'; 
 
 const Evaluates = () => {
@@ -44,6 +43,7 @@ const Evaluates = () => {
     const [SelectedPart, setSelectedPart] = useState(null);
     const [Eval, setEval] = useState('');
     const get_database = async () => {
+        loading();
         const result_part = await get_part();
         const results = await get_evaluation();
         let partfilter, evlfilter;
@@ -63,6 +63,7 @@ const Evaluates = () => {
         }));
         setPart(options);
         setEval(evlfilter);
+        loading('success');
     }
 
     // ทุกครั้งที่กด
@@ -143,6 +144,74 @@ const Evaluates = () => {
         setSelectedPart(partlast.label);
     }
 
+    // 4. เก็บคะแนนแต่ละ group (group ที่ติ๊กครบและเลือกคะแนนเท่านั้น, ไม่ครบเป็น 0)
+    const condition_four = (uniqueGroups) => {
+        const results = [];
+        const invalidGroups = [];
+        for (const group of uniqueGroups) {
+            const questionData = Eval.filter(item => item.evaluation_question_group === group);
+            const questionItem = questionData[0] || {};
+            const questionid = questionItem.evaluation_question_id || null;
+            const weight = questionItem.evaluation_question_weight || 0;
+            let score = 0;
+            if (isGroupAllChecked(group)) {
+                score = groupRatings[group]?.value || 0;
+            }
+            let comment = (comments[group] || '').trim();
+            if (score === 0) {
+                comment = '-';
+            } else if (score < 3 && (!comment || comment === '-')) {
+                invalidGroups.push(group);
+            } else if (score >= 3 && !comment) {
+                comment = '-';
+            }
+
+            results.push({ group, questionid, weight, score, comment });
+        }
+        if (invalidGroups.length) {
+            alertwarning(`Please provide a comment for group(s): <b>${invalidGroups.join(', ')}</b> where score is less than 3.`);
+            return;
+        }
+        return results;
+    }
+
+    // 6. เช็คหัวข้อที่สำคัญ (evaluation_question_importent === 'importent')
+    const condition_six = (results) => {
+        const importantItems = Eval.filter(item => item.evaluation_question_important === 'important');
+        const unimportantItems = Eval.filter(item => item.evaluation_question_important === 'unimportant');
+        let hasImportantFail = false;
+        let status_eval = '';
+        // เช็ค important
+        for (const item of importantItems) {
+            const group = item.evaluation_question_group;
+            const score = results.find(r => r.group === group)?.score || 0;
+            if (score < 3) {
+                status_eval = 'Fail';
+                hasImportantFail = true;
+                break;
+            }
+        }
+        // เช็ค unimportant (เฉพาะตอน important ไม่ fail)
+        if (!hasImportantFail) {
+            let unimportantFails = 0;
+            for (const item of unimportantItems) {
+                const group = item.evaluation_question_group;
+                const score = results.find(r => r.group === group)?.score || 0;
+                if (score < 3) {
+                    unimportantFails++;
+                    if (unimportantFails > 1) {
+                        status_eval = 'Fail';
+                        break;
+                    }
+                }
+            }
+            if (!status_eval) {
+                status_eval = 'Pass';
+            }
+        }
+        return status_eval;
+    }
+
     // กดปุ่มส่งเมื่อทำประเมืืนเสร็ต
     const submit_eval = async () => {
         const uniqueGroups = [...new Set(Eval.map(item => item.evaluation_question_group))];
@@ -158,7 +227,7 @@ const Evaluates = () => {
             }
         });
         if (!isValid) {
-            alertsmall('warning', 'Please select a rating in the group: ' + missingRatingGroups.join(', '));
+            alertwarning('Please select a rating in the group: <b>' + missingRatingGroups.join(', ') + '</b>');
             return;
         }
         loading();
@@ -171,44 +240,36 @@ const Evaluates = () => {
             const partChecked = partCheckboxIds.some(id => checked[id]);
             if (!partChecked) {
                 // ดึงชื่อ Part มาแสดงใน alert
-                const partName = Eval.find(item => item.part_id === part)?.part_name || `Part ${part}`; // ถ้าไม่มีชื่อให้ใช้ชื่อเป็น "Part X"
+                const partName = Eval.find(item => item.part_id === part)?.part_name || `Part ${part}`; // ถ้าไม่มีชื่อให้ใช้ชื่อเป็น 'Part X'
                 missingParts.push(partName); // ถ้าไม่มีการติ๊กใน Part นั้น ๆ ให้เพิ่มไปยัง missingParts
             }
         });
         // ถ้ามี Part ไหนที่ยังไม่ได้ทำ จะขึ้น alert แบบคำถาม
         if (missingParts.length > 0) {
-            const confirmResult = await alertquestion(`You haven't evaluated the following parts: ${missingParts.join(', ')}. Would you like to proceed?`);
+            const confirmResult = await alertquestion(`You haven't evaluated the following parts: <b>${missingParts.join(', ')}.</b> Would you like to proceed?`);
             if (!confirmResult.isConfirmed) return;
         }
+
         // 4. เก็บคะแนนแต่ละ group (group ที่ติ๊กครบและเลือกคะแนนเท่านั้น, ไม่ครบเป็น 0)
-        const results = uniqueGroups.map(group => {
-            let questionid = null;
-            let weight = 0;
-            let score = 0;
-            const questionData = Eval.filter(item => item.evaluation_question_group === group);
-            if (isGroupAllChecked(group)) {
-                score = groupRatings[group]?.value || 0;
-            }
-            if (questionData.length > 0) {
-                weight = Eval.filter(item => item.evaluation_question_group === group)[0]?.evaluation_question_weight || 0;
-                questionid = questionData[0]?.evaluation_question_id || null; // เก็บทุก evaluation_question_id ของ group นี้
-            }
-            const comment = comments[group] || '-';
-            return { group, questionid, weight, score, comment };
-        });
+        const results = condition_four(uniqueGroups);
+        if (!results) return;
+
         // 5. เก็บสถานะ checkbox ทุกข้อ
         const allCheckStates = Eval.filter(item => item.evaluation_question_section === 'two').map(item => ({ eval_question_id: item.evaluation_question_id, checked: !!checked[item.evaluation_question_id] }));
+
+        // 6. เช็คหัวข้อที่สำคัญ (evaluation_question_importent === 'importent')
+        const status_eval = condition_six(results);
+
         // ส่งข้อมูล
-        const result = await save_evaluation(Employee.id, decoded.crew_id, SelectedPartID, results, allCheckStates, parseFloat((getTotalScore() / getTotalGroups()).toFixed(1)));
+        const result = await save_evaluation(Employee.id, decoded.crew_id, results, allCheckStates, parseFloat((getTotalScore() / getTotalGroups()).toFixed(1)), status_eval);
         if (result === 'success') {
             alertsuccessredirect('Evaluation saved successfully.');
         } else {
             alertsmall('error', 'Please contact the system administrator.');
         }
+
     };
 
-
-    
     return (
         <Container fluid id='footer'>
             <Navbars />
@@ -259,10 +320,10 @@ const Evaluates = () => {
                                             // ข้อความตัวหน้า: รวม cell 1,2 เป็นข้อความ, cell 3 = select+ปุ่ม
                                             return (
                                                 <tr key={index + 1}>
-                                                    <td colSpan={2} style={{fontWeight: 700, fontSize: 16, whiteSpace: isGroupAllChecked(data.evaluation_question_group) ? 'normal' : 'nowrap', maxWidth: '40vw'}}>
+                                                    <td colSpan={2} style={{fontWeight: 700, fontSize: 16, backgroundColor: '#dcdcdc', whiteSpace: isGroupAllChecked(data.evaluation_question_group) ? 'normal' : 'nowrap', maxWidth: '40vw'}}>
                                                         {data.evaluation_question_text}
                                                     </td>
-                                                    <td style={{textAlign: 'center', verticalAlign: 'middle', padding: 0}}>
+                                                    <td style={{textAlign: 'center', backgroundColor: '#dcdcdc', verticalAlign: 'middle', padding: 0}}>
                                                         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
                                                             <span style={{fontSize: '14px', paddingRight: '10px'}}>
                                                                 {isGroupAllChecked(data.evaluation_question_group) ? 
@@ -318,13 +379,13 @@ const Evaluates = () => {
                         <Col md={12} className='midpoint mb-3'>
                             {SelectedPartID && [
                                 SelectedPartID !== 1 && (
-                                    <Button key="prev" variant='warning' className='btns' style={{width: '300px'}} onClick={() => btn_part('prev')}>Previous</Button>
+                                    <Button key='prev' variant='warning' className='btns' style={{width: '300px'}} onClick={() => btn_part('prev')}>Previous</Button>
                                 ),
                                 SelectedPartID < Part.length && (
-                                    <Button key="next" variant='warning' className='btns' style={{width: '300px'}} onClick={() => btn_part('next')}>Next</Button>
+                                    <Button key='next' variant='warning' className='btns' style={{width: '300px'}} onClick={() => btn_part('next')}>Next</Button>
                                 ),
                                 SelectedPartID === Part.length && (
-                                    <Button key="submit" variant='warning' className='btns' style={{width: '300px'}} onClick={submit_eval}>Submit</Button>
+                                    <Button key='submit' variant='warning' className='btns' style={{width: '300px'}} onClick={submit_eval}>Submit</Button>
                                 )
                             ]}
                         </Col>

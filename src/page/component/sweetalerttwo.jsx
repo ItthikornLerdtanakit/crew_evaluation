@@ -31,12 +31,30 @@ export const alertquestion = async (text) => {
     });
     return await swalWithBootstrapButtons.fire({
         title: 'Are you sure?',
-        text: text,
+        html: text,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Yes, Submit',
         cancelButtonText: 'Cancel',
         reverseButtons: true
+    });
+}
+
+// การแจ้งเตือนเมื่อมีการถามว่าจะต้องการทำอะไร
+export const alertwarning = (text) => {
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+          cancelButton: 'btn btn-danger m-2'
+        },
+        buttonsStyling: false
+    });
+    swalWithBootstrapButtons.fire({
+        title: 'Warning!',
+        html: text,
+        icon: 'warning',
+        showCancelButton: true,
+        showConfirmButton: false,
+        cancelButtonText: 'OK',
     });
 }
 
