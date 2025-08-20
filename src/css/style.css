@@ -181,14 +181,26 @@ body {
     font-weight: 600;
 }
 
+
 .title_round {
     font-size: 20px;
     font-weight: 500;
 }
 
-.title_round p {
+.evaluation-header, .title_round p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 2px solid black;
     padding-bottom: 5px;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
 }
 
 .card {

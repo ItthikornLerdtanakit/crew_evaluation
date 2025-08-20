@@ -36,6 +36,7 @@ const Evaluatelist = () => {
         loading('success');
     }
 
+    // เมื่อกดไปยังหน้า result โดยการส่งข้อมูลไปหน้านั้นด้วย
     const redirect = (data) => {
         let data_crew = location.state;
         delete data_crew.evaluation_totalscore;
@@ -63,7 +64,7 @@ const Evaluatelist = () => {
                                 <tr>
                                     <th style={{verticalAlign: 'middle'}}>NokID</th>
                                     <th style={{verticalAlign: 'middle'}}>Name</th>
-                                    <th style={{verticalAlign: 'middle'}}>Score</th>
+                                    <th style={{verticalAlign: 'middle'}}>Result</th>
                                     <th style={{width: '40px'}}></th>
                                 </tr>
                             </thead>
@@ -72,7 +73,7 @@ const Evaluatelist = () => {
                                     <tr key={data.crew_id} style={{cursor: 'pointer'}} onClick={() => redirect(data)}>
                                         <td style={{verticalAlign: 'middle'}}>{data.crew_code}</td>
                                         <td style={{verticalAlign: 'middle'}}>{data.crew_nameen}</td>
-                                        <td style={{textAlign: 'center', verticalAlign: 'middle'}}>{data.evaluation_totalscore}</td>
+                                        <td style={{textAlign: 'center', verticalAlign: 'middle', color: data.evaluation_status === 'Pass' ? 'green' : 'red'}}>{data.evaluation_status}</td>
                                         <td style={{fontSize: '20px', verticalAlign: 'middle', padding: 0}}><GoChevronRight /></td>
                                     </tr>
                                 )) : (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -28,6 +28,7 @@ const Result = () => {
         if (!location.state) {
             return navigate(-1);
         }
+        console.log(location.state);
         setEmployee(location.state);
         get_database(location.state.evaluation_id);
     }, []);
@@ -96,7 +97,7 @@ const Result = () => {
                                 <Col className='col-7'>
                                     <p className='mb-2'>{Employee.crew_nameen}</p>
                                     <p className='mb-2'>{Employee.evaluation_created_at}</p>
-                                    <p className='mb-2'>{Employee.evaluation_totalscore} / 5.0</p>
+                                    <p className='mb-2'>{(Employee?.evaluation_totalscore ?? 0).toFixed(1)} / 5.0</p>
                                     <p className='mb-2'>{Employee.crew_position}</p>
                                     <p className='mb-2'>{Employee.evaluator_name}</p>
                                 </Col>
@@ -138,8 +139,8 @@ const Result = () => {
                                         } else {
                                             // รายการย่อย: cell 1 = checkbox/ว่าง, cell 2+3 รวมกัน = ข้อความ
                                             return (
-                                                <>
-                                                    <tr key={index + 1}>
+                                                <React.Fragment key={index + 1}>
+                                                    <tr>
                                                         <td style={{textAlign: 'center', verticalAlign: 'middle', width: 40}}>
                                                             {data.evaluation_question_section === 'two' && EvalGroupItem && EvalGroupItem[data.evaluation_question_id]?.check ? <BsCheckLg /> : null}
                                                         </td>
@@ -155,7 +156,7 @@ const Result = () => {
                                                             <td colSpan={3} style={{height: '100px', fontWeight: 700, fontSize: 14, fontStyle: 'italic'}}>Comment : {Comment && EvalGroupResult ? EvalGroupResult[Comment[data.evaluation_question_group]].comment : '-'}</td>
                                                         </tr>
                                                     )}
-                                                </>
+                                                </React.Fragment>
                                             );
                                         }
                                     })}
