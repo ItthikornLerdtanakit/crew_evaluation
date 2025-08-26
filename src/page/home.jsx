@@ -79,6 +79,7 @@ const Home = () => {
         // เพิ่ม key ใหม่
         data_new = {
             ...data_new,
+            crew_level: decoded.crew_level,
             evaluator_name: data.crew_nameen,
         };
         navigate('/result', { state: data_new });

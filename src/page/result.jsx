@@ -28,7 +28,6 @@ const Result = () => {
         if (!location.state) {
             return navigate(-1);
         }
-        console.log(location.state);
         setEmployee(location.state);
         get_database(location.state.evaluation_id);
     }, []);
@@ -161,11 +160,28 @@ const Result = () => {
                                         }
                                     })}
                                     {Eval && Eval.filter(data => data.part_id === SelectedPartID).length > 0 ? (
-                                        <tr>
-                                            <td colSpan={3} style={{textAlign: 'right', fontWeight: 700}}>
-                                                <span>Total : {Employee.evaluation_totalscore.toFixed(1)}</span>
-                                            </td>
-                                        </tr>
+                                        (() => {
+                                            const sectionOneQuestions = Eval.filter(data => data.part_id === SelectedPartID && data.evaluation_question_section === 'one'); // ดึงคำถามเฉพาะ section 'one' ของ part นี้
+                                            const count = sectionOneQuestions.length; // จำนวนคำถามที่ใช้คำนวณ
+                                            const totalScore = sectionOneQuestions.reduce((sum, data) => { // รวมคะแนนแบบ (weight * score)
+                                                const result = EvalGroupResult?.[data.evaluation_question_id];
+                                                if (result) {
+                                                    return sum + (result.weight * result.score);
+                                                }
+                                                return sum;
+                                            }, 0);
+                                            const average = count > 0 ? (totalScore / count) : 0; // คำนวณค่าเฉลี่ย (Sub-Total)
+                                            return (
+                                                <tr>
+                                                    <td colSpan={2} style={{fontWeight: 700}}>
+                                                        <span>Sub-Total : {average.toFixed(1)}</span>
+                                                    </td>
+                                                    <td colSpan={1} style={{textAlign: 'right', fontWeight: 700}}>
+                                                        <span>Total : {Employee.evaluation_totalscore.toFixed(1)}</span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })()
                                     ) : (
                                         <tr>
                                             <td colSpan={3} style={{textAlign: 'center', fontWeight: 700}}>

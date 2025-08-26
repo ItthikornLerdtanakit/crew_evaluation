@@ -15,7 +15,7 @@ import Navbars from './component/navbar/navbarback';
 import Footer from './component/footer';
 import { get_part, get_evaluation, save_evaluation } from './component/connectdatabase';
 import { loading, alertquestion, alertwarning, alertsmall, alertsuccessredirect } from './component/sweetalerttwo';
-import Modalcomment from './component/modal/modalcomment'; 
+import Modalcomment from './component/modal/modalcomment';
 
 const Evaluates = () => {
     const location = useLocation();
@@ -25,7 +25,7 @@ const Evaluates = () => {
 
     // ข้อมูลใน Select
     const Options_UserType = [{ value: 1, label: 1 }, { value: 2, label: 2 }, { value: 3, label: 3 }, { value: 4, label: 4 }, { value: 5, label: 5 }];
-    
+
     // โหลดข้อมูลเมื่อเริ่มต้น
     const [Employee, setEmployee] = useState({});
     useEffect(() => {
@@ -165,7 +165,6 @@ const Evaluates = () => {
             } else if (score >= 3 && !comment) {
                 comment = '-';
             }
-
             results.push({ group, questionid, weight, score, comment });
         }
         if (invalidGroups.length) {
@@ -175,42 +174,54 @@ const Evaluates = () => {
         return results;
     }
 
-    // 6. เช็คหัวข้อที่สำคัญ (evaluation_question_importent === 'importent')
+    // 6. เช็คจุดสำคัญมีเงื่อนไขดังนี้ (โดยมีหลาย Part)
+    //    - ถ้า Part ไหนมีหัวข้อ Important ทั้งหมดให้ทำเช็คแค่คะแนนรวม ไม่เช็คคะแนนรายหัวข้อ ถ้าคะแนนรวมต่ำกว่า 3 ให้ Fail
+    //    - ถ้า Part ไหนมีหัวข้อ Important บางหัวข้อให้เช็คเฉพาะหัวข้อที่มี Important ถ้ามีคะแนนต่ำกว่า 3 ให้ Fail
+    //    - ถ้า Part ไหนมีหัวข้อ UnImportant ให้เช็คทั้งหมดที่มี UnImportant ของทุก Part โดยถ้า Unimportant มีคะแนนต่ำกว่า 3 มากกว่า 1 คนให้ Fail
+    //    - และคะแนนรวมทั้งหมดถ้าต่ำกว่า 3 ให้ Fail
     const condition_six = (results) => {
-        const importantItems = Eval.filter(item => item.evaluation_question_important === 'important');
+        // Map group กับ part_id
+        results.forEach(r => {
+            const hit = Eval.find(e => e.evaluation_question_group === r.group);
+            r.part_id = hit?.part_id ?? null;
+        });
+        // Group ผลลัพธ์แยกตาม Part
+        const resultsByPart = {};
+        results.forEach(r => {
+            if (!resultsByPart[r.part_id]) resultsByPart[r.part_id] = [];
+            resultsByPart[r.part_id].push(r);
+        });
+        for (const [partId, partResults] of Object.entries(resultsByPart)) {
+            const groupsInThisPart = partResults.map(r => r.group);
+            const itemsInThisPart = Eval.filter(item =>
+                item.part_id === parseInt(partId) &&
+                groupsInThisPart.includes(item.evaluation_question_text)
+            );
+            const importantItems = itemsInThisPart.filter(item => item.evaluation_question_important === 'important');
+            const allImportant = importantItems.length === itemsInThisPart.length;
+            if (allImportant) {
+                const avg = partResults.reduce((sum, r) => sum + (Number(r.score) || 0), 0) / partResults.length;
+                if (avg < 3) return 'Fail';
+            } else {
+                const hasLowImportant = importantItems.some(item => {
+                    const score = partResults.find(r => r.group === item.evaluation_question_group)?.score || 0;
+                    return score < 3;
+                });
+                if (hasLowImportant) return 'Fail';
+            }
+        }
         const unimportantItems = Eval.filter(item => item.evaluation_question_important === 'unimportant');
-        let hasImportantFail = false;
-        let status_eval = '';
-        // เช็ค important
-        for (const item of importantItems) {
+        let unimportantFails = 0;
+        for (const item of unimportantItems) {
             const group = item.evaluation_question_group;
             const score = results.find(r => r.group === group)?.score || 0;
-            if (score < 3) {
-                status_eval = 'Fail';
-                hasImportantFail = true;
-                break;
-            }
+            if (score < 3 && ++unimportantFails > 1) return 'Fail';
         }
-        // เช็ค unimportant (เฉพาะตอน important ไม่ fail)
-        if (!hasImportantFail) {
-            let unimportantFails = 0;
-            for (const item of unimportantItems) {
-                const group = item.evaluation_question_group;
-                const score = results.find(r => r.group === group)?.score || 0;
-                if (score < 3) {
-                    unimportantFails++;
-                    if (unimportantFails > 1) {
-                        status_eval = 'Fail';
-                        break;
-                    }
-                }
-            }
-            if (!status_eval) {
-                status_eval = 'Pass';
-            }
-        }
-        return status_eval;
+        const totalAvg = results.reduce((sum, r) => sum + (Number(r.score) || 0), 0) / results.length;
+        if (totalAvg < 3) return 'Fail';
+        return 'Pass';
     }
+
 
     // กดปุ่มส่งเมื่อทำประเมืืนเสร็ต
     const submit_eval = async () => {
@@ -255,7 +266,7 @@ const Evaluates = () => {
         if (!results) return;
 
         // 5. เก็บสถานะ checkbox ทุกข้อ
-        const allCheckStates = Eval.filter(item => item.evaluation_question_section === 'two').map(item => ({ eval_question_id: item.evaluation_question_id, checked: !!checked[item.evaluation_question_id] }));
+        const allCheckStates = Eval.filter(item => item.evaluation_question_section === 'two').map(item => ({ evaluation_question_id: item.evaluation_question_id, checked: !!checked[item.evaluation_question_id] }));
 
         // 6. เช็คหัวข้อที่สำคัญ (evaluation_question_importent === 'importent')
         const status_eval = condition_six(results);
@@ -268,12 +279,12 @@ const Evaluates = () => {
             alertsmall('error', 'Please contact the system administrator.');
         }
 
-    };
+    }
 
     return (
         <Container fluid id='footer'>
             <Navbars />
-            <Row style={{flex: 1}}>
+            <Row style={{ flex: 1 }}>
                 <Col md={12}>
                     <Row className='titles mt-4'>
                         <p>Crew Evaluation</p>
@@ -298,7 +309,7 @@ const Evaluates = () => {
                     </Row>
                     <Row className='midpoint'>
                         <Col md={7}>
-                            <p style={{textAlign: 'center'}}>Crew Evaluation Progress Bar</p>
+                            <p style={{ textAlign: 'center' }}>Crew Evaluation Progress Bar</p>
                             <ul id='progressbar' className='text-center midpoint'>
                                 {Part && Part.map(data => (
                                     <li key={data.value} data-step={data.value} className={`step0 ${SelectedPartID >= data.value ? 'active' : ''} ${SelectedPartID > data.value ? 'success' : ''}`}>
@@ -311,7 +322,7 @@ const Evaluates = () => {
                             <Table className='tables'>
                                 <thead>
                                     <tr>
-                                        <th colSpan={3} style={{textAlign: 'left'}}>{SelectedPart}</th>
+                                        <th colSpan={3} style={{ textAlign: 'left' }}>{SelectedPart}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -320,19 +331,19 @@ const Evaluates = () => {
                                             // ข้อความตัวหน้า: รวม cell 1,2 เป็นข้อความ, cell 3 = select+ปุ่ม
                                             return (
                                                 <tr key={index + 1}>
-                                                    <td colSpan={2} style={{fontWeight: 700, fontSize: 16, backgroundColor: '#dcdcdc', whiteSpace: isGroupAllChecked(data.evaluation_question_group) ? 'normal' : 'nowrap', maxWidth: '40vw'}}>
+                                                    <td colSpan={2} style={{ fontWeight: 700, fontSize: 16, backgroundColor: '#dcdcdc', whiteSpace: isGroupAllChecked(data.evaluation_question_group) ? 'normal' : 'nowrap', maxWidth: '40vw' }}>
                                                         {data.evaluation_question_text}
                                                     </td>
-                                                    <td style={{textAlign: 'center', backgroundColor: '#dcdcdc', verticalAlign: 'middle', padding: 0}}>
-                                                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                                                            <span style={{fontSize: '14px', paddingRight: '10px'}}>
-                                                                {isGroupAllChecked(data.evaluation_question_group) ? 
-                                                                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                                                                        <Select options={Options_UserType} styles={customStylesRating} className='custom-select' isSearchable={false} value={groupRatings[data.evaluation_question_group] || null} onChange={option => setGroupRatings(prev => ({...prev, [data.evaluation_question_group]: option}))} placeholder='-' />
+                                                    <td style={{ textAlign: 'center', backgroundColor: '#dcdcdc', verticalAlign: 'middle', padding: 0 }}>
+                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                            <span style={{ fontSize: '14px', paddingRight: '10px' }}>
+                                                                {isGroupAllChecked(data.evaluation_question_group) ?
+                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                                        <Select options={Options_UserType} styles={customStylesRating} className='custom-select' isSearchable={false} value={groupRatings[data.evaluation_question_group] || null} onChange={option => setGroupRatings(prev => ({ ...prev, [data.evaluation_question_group]: option }))} placeholder='-' />
                                                                         <Button variant='warning' size='sm' className='btncomment' onClick={() => CommentEval(data.evaluation_question_group)}>Comment</Button>
                                                                     </div>
-                                                                : 
-                                                                    <span style={{fontWeight: '700'}}>Score: 0.0</span>
+                                                                    :
+                                                                    <span style={{ fontWeight: '700' }}>Score: 0.0</span>
                                                                 }
                                                             </span>
                                                         </div>
@@ -343,12 +354,12 @@ const Evaluates = () => {
                                             // รายการย่อย: cell 1 = checkbox/ว่าง, cell 2+3 รวมกัน = ข้อความ
                                             return (
                                                 <tr key={index + 1}>
-                                                    <td style={{textAlign: 'center', verticalAlign: 'middle', width: 40}}>
+                                                    <td style={{ textAlign: 'center', verticalAlign: 'middle', width: 40 }}>
                                                         {data.evaluation_question_section === 'two' ? (
                                                             <input className='form-check-input' type='checkbox' name={data.evaluation_question_group} checked={!!checked[data.evaluation_question_id]} onChange={() => handleChange(data.evaluation_question_id)} />
                                                         ) : null}
                                                     </td>
-                                                    <td colSpan={2} style={{fontSize: 14, fontWeight: 400}}>
+                                                    <td colSpan={2} style={{ fontSize: 14, fontWeight: 400 }}>
                                                         {data.evaluation_question_section === 'three' ? (
                                                             <span className='dot'>•</span>
                                                         ) : null}
@@ -360,32 +371,35 @@ const Evaluates = () => {
                                     })}
                                     {Eval && Eval.filter(data => data.part_id === SelectedPartID).length > 0 ? (
                                         <tr>
-                                            <td colSpan={3} style={{textAlign: 'right', fontWeight: 700}}>
-                                                <span>Total1 : {(getTotalScore() / getTotalGroups()).toFixed(1)}</span>
+                                            <td colSpan={2} style={{ fontWeight: 700 }}>
+                                                <span>Sub-Total : {(Eval.filter(data => data.part_id === SelectedPartID && data.evaluation_question_section === 'one').reduce((sum, item) => { const group = item.evaluation_question_group; const value = groupRatings[group]?.value || 0; return sum + value; }, 0) / Eval.filter(data => data.part_id === SelectedPartID && data.evaluation_question_section === 'one').length || 0).toFixed(1)}</span>
+                                            </td>
+                                            <td colSpan={1} style={{ textAlign: 'right', fontWeight: 700 }}>
+                                                <span>Total : {(getTotalScore() / getTotalGroups()).toFixed(1)}</span>
                                             </td>
                                         </tr>
                                     ) : (
                                         <tr>
-                                            <td colSpan={3} style={{textAlign: 'center', fontWeight: 700}}>
+                                            <td colSpan={3} style={{ textAlign: 'center', fontWeight: 700 }}>
                                                 <span>There are no questions for evaluation in this part.</span>
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
-                        </Table>
+                            </Table>
                         </Col>
                     </Row>
                     <Row>
                         <Col md={12} className='midpoint mb-3'>
                             {SelectedPartID && [
                                 SelectedPartID !== 1 && (
-                                    <Button key='prev' variant='warning' className='btns' style={{width: '300px'}} onClick={() => btn_part('prev')}>Previous</Button>
+                                    <Button key='prev' variant='warning' className='btns' style={{ width: '300px' }} onClick={() => btn_part('prev')}>Previous</Button>
                                 ),
                                 SelectedPartID < Part.length && (
-                                    <Button key='next' variant='warning' className='btns' style={{width: '300px'}} onClick={() => btn_part('next')}>Next</Button>
+                                    <Button key='next' variant='warning' className='btns' style={{ width: '300px' }} onClick={() => btn_part('next')}>Next</Button>
                                 ),
                                 SelectedPartID === Part.length && (
-                                    <Button key='submit' variant='warning' className='btns' style={{width: '300px'}} onClick={submit_eval}>Submit</Button>
+                                    <Button key='submit' variant='warning' className='btns' style={{ width: '300px' }} onClick={submit_eval}>Submit</Button>
                                 )
                             ]}
                         </Col>
