@@ -51,20 +51,34 @@ const Menu = () => {
                                 <p>Conduct Evaluation</p>
                             </Col>
                             <Col md={12} className='mb-2 midpoint'>
-                                <Button variant='warning' style={{height: '85px', width: '250px', fontSize: '22px'}} onClick={() => navigate('/crew')}>Conduct Evaluation</Button>
+                                <Button variant='warning' style={{height: '85px', width: '250px', fontSize: '22px'}} onClick={() => navigate('/crew', { state: 'person' })}>Conduct Evaluation</Button>
                             </Col>
                         </Row>
                     </Col>
-                    <Col xxl={2}>
-                        <Row>
-                            <Col md={12} className='title_round mt-2'>
-                                <p>Evaluation Results</p>
-                            </Col>
-                            <Col md={12} className='mb-2 midpoint'>
-                                <Button variant='warning' style={{height: '85px', width: '250px', fontSize: '22px'}} onClick={() => navigate('/home')}>Evaluation Results</Button>
-                            </Col>
-                        </Row>
-                    </Col>
+                    {decoded.crew_level === 'level_2'  || decoded.crew_level === 'level_3' ? (
+                        <Col xxl={2}>
+                            <Row>
+                                <Col md={12} className='title_round mt-2'>
+                                    <p>Evaluation Results</p>
+                                </Col>
+                                <Col md={12} className='mb-2 midpoint'>
+                                    <Button variant='warning' style={{height: '85px', width: '250px', fontSize: '22px'}} onClick={() => navigate('/home')}>Evaluation Results</Button>
+                                </Col>
+                            </Row>
+                        </Col>
+                    ) : null}
+                    {decoded.crew_level === 'level_4' ? (
+                        <Col xxl={2}>
+                            <Row>
+                                <Col md={12} className='title_round mt-2'>
+                                    <p>Evaluation Results All</p>
+                                </Col>
+                                <Col md={12} className='mb-2 midpoint'>
+                                    <Button variant='warning' style={{height: '85px', width: '250px', fontSize: '22px'}} onClick={() => navigate('/crew', { state: 'all' })}>Evaluation Results</Button>
+                                </Col>
+                            </Row>
+                        </Col>
+                    ) : null}
                 </Row>
             </Col>
         </Row>

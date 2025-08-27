@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 // นำเข้ามาจาก Bootstrap
@@ -19,6 +19,7 @@ import { get_evaluator } from './component/connectdatabase';
 import { GoChevronRight } from 'react-icons/go';
 
 const Crew = () => {
+    const location = useLocation();
     const navigate = useNavigate();
     const token = localStorage.getItem('tokens');
     const decoded = jwtDecode(token);
@@ -31,13 +32,13 @@ const Crew = () => {
     const [Employee, setEmployee] = useState(null);
     const get_database = async () => {
         loading();
-        const result = await get_evaluator(decoded.crew_level, decoded.crew_id);
+        const result = await get_evaluator(decoded.crew_level, decoded.crew_id, location.state);
         setEmployee(result);
         loading('success');
     }
 
     const redirect = (data) => {
-        if (decoded.crew_level === 'level_4') {
+        if ((decoded.crew_level === 'level_4' && location.state === 'all') || decoded.crew_level === 'level_5') {
             navigate('/evaluatelist', { state: data });
         } else if (data.status) {
             let data_crew = data;
@@ -54,7 +55,7 @@ const Crew = () => {
 
     return (
         <Container fluid>
-        {decoded.crew_level === 'level_2' || decoded.crew_level === 'level_3' ? (
+        {decoded.crew_level === 'level_2' || decoded.crew_level === 'level_3' || decoded.crew_level === 'level_4' ? (
             <Navbarback />
         ) : (
             <Navbarlogout />

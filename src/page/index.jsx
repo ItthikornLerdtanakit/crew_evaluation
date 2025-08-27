@@ -23,7 +23,7 @@ const Index = () => {
 
     const [Nokid, setNokid] = useState('');
     const [Password, setPassword] = useState('');
-    const [Remember, setRemember] = useState(null);
+    const [Remember, setRemember] = useState(false);
     useEffect(() => {
         document.title = 'Login';
         const login_data = localStorage.getItem(import.meta.env.VITE_LOGINSESSION) ? JSON.parse(localStorage.getItem(import.meta.env.VITE_LOGINSESSION)) : null;
@@ -31,6 +31,7 @@ const Index = () => {
             setNokid(login_data.nokid);
             setPassword(login_data.passwords);
             setRemember(login_data.remember);
+            console.log(typeof login_data.remember)
         }
     }, []);
 
@@ -76,19 +77,21 @@ const Index = () => {
         if (!nokid.value || !passwords.value) {
             checkvalue(nokid, passwords);
         } else {
-            const result_login = await login(nokid.value, passwords.value);
+            const formatted_nokid = nokid.value.toUpperCase();
+            const formatted_passwords = passwords.value.toUpperCase();
+            const result_login = await login(formatted_nokid, formatted_passwords);
             if (result_login.auth === false) {
                 alertsmall('error', 'NokID or Password Incorrect');
             } else {
                 if (remember.checked === true) {
-                    const login_data = { nokid: nokid.value, passwords: passwords.value, remember: true };
+                    const login_data = { nokid: formatted_nokid, passwords: formatted_passwords, remember: true };
                     localStorage.setItem(import.meta.env.VITE_LOGINSESSION, JSON.stringify(login_data));
                 } else {
                     localStorage.removeItem(import.meta.env.VITE_LOGINSESSION);
                 }
                 if (result_login.crew_level === 'level_1') {
                     navigate('/home');
-                } else if (result_login.crew_level === 'level_2' || result_login.crew_level === 'level_3') {
+                } else if (result_login.crew_level === 'level_2' || result_login.crew_level === 'level_3' || result_login.crew_level === 'level_4') {
                     navigate('/menu');
                 } else {
                     navigate('/crew');
@@ -112,7 +115,7 @@ const Index = () => {
                         <p>Crew Evaluation Website</p>
                     </Col>
                     <Col md={12} className='midpoint mt-3'>
-                        <Form style={{width: '100%'}} onSubmit={(e) => e.preventDefault()}>
+                        <Form style={{width: '100%'}} onSubmit={(e) => { e.preventDefault(); document.getElementById('password_login').focus(); }}>
                             <Form.Group>
                                 <Form.Label>Nok ID</Form.Label>
                                 <InputGroup className='inputgroups' id='inputgroups_nokid'>
@@ -126,7 +129,7 @@ const Index = () => {
                         <p style={{color: 'red'}}>Please enter your nokid address correctly.</p>
                     </Col>
                     <Col md={12} className='midpoint mt-2'>
-                        <Form style={{width: '100%'}} onSubmit={(e) => { e.preventDefault(); }}>
+                        <Form style={{width: '100%'}} onSubmit={(e) => { e.preventDefault(); login(); }}>
                             <Form.Group>
                                 <Form.Label>Password</Form.Label>
                                 <InputGroup className='inputgroups' id='inputgroups_password'>
@@ -143,7 +146,7 @@ const Index = () => {
                         <Row>
                             <Col className='col-6'>
                                 <label className='custom-radio'>
-                                    <input type='checkbox' id='remember' className='radio-input' defaultChecked={Remember} />
+                                    <input type='checkbox' id='remember' className='radio-input' checked={Remember} onChange={(e) => setRemember(e.target.checked)} />
                                     <span className='checkmark'></span>
                                     <b>Remember me</b>
                                 </label>

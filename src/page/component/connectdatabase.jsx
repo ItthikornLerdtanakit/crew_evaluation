@@ -47,9 +47,9 @@ export const get_evaluation = async () => {
 }
 
 // ดึงข้อมูลผู้ประเมิน
-export const get_evaluator = async (level, supervisor) => {
+export const get_evaluator = async (level, supervisor, status) => {
     try {
-        const response = await axios.post(ipaddress + import.meta.env.VITE_EVALUATOR, { level, supervisor });
+        const response = await axios.post(ipaddress + import.meta.env.VITE_EVALUATOR, { level, supervisor, status });
         return response.data;
     } catch (error) {
         console.error(error);
